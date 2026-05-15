@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NET Prep Master - UGC NET CBT Simulator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2196F3;
+            --primary-dark: #1976D2;
+            --secondary: #E3F2FD;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --success: #10b981;
+            --error: #ef4444;
+            --review: #f59e0b;
+            --border: #e2e8f0;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 72px;
+            background: var(--surface);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+            background: var(--primary);
+            color: white;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(33, 150, 243, 0.4);
+        }
+
+        .logo h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .exam-timer {
+            background: #fef2f2;
+            color: var(--error);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 20px;
+            border: 2px solid #fee2e2;
+            display: none;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        /* Content Area */
+        main {
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .view {
+            display: none;
+            padding: 40px;
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .view.active {
+            display: block;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Dashboard */
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .dashboard-header h2 {
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dashboard-header p {
+            font-size: 18px;
+            color: var(--text-muted);
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+            margin-bottom: 60px;
+        }
+
+        .card {
+            background: var(--surface);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid transparent;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .card:hover::before { opacity: 1; }
+
+        .card-icon {
+            font-size: 48px;
+            margin-bottom: 24px;
+            display: block;
+        }
+
+        .card h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .year-select-container {
+            margin-top: 16px;
+        }
+
+        select {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            background: #f1f5f9;
+            cursor: pointer;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        select:focus { border-color: var(--primary); background: white; }
+
+        /* CBT Interface */
+        #exam-view {
+            padding: 0;
+            max-width: none;
+            height: calc(100vh - 72px);
+        }
+
+        .cbt-container {
+            display: flex;
+            height: 100%;
+        }
+
+        .question-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-right: 1px solid var(--border);
+        }
+
+        .q-header {
+            padding: 24px 48px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .q-header h2 { font-size: 20px; font-weight: 700; }
+        .q-tag { background: var(--secondary); color: var(--primary); padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+
+        .q-scroll-area {
+            flex: 1;
+            padding: 48px 80px;
+            overflow-y: auto;
+        }
+
+        .q-text {
+            font-size: 24px;
+            font-weight: 500;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            color: #0f172a;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .option {
+            padding: 20px 30px;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .option:hover { border-color: var(--primary); background: #f0f9ff; }
+        .option.selected { border-color: var(--primary); background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3); }
+
+        .option-bullet {
+            width: 24px;
+            height: 24px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            margin-right: 20px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .selected .option-bullet::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .cbt-footer {
+            padding: 24px 48px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            background: #f8fafc;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            border: 2px solid var(--border);
+            background: white;
+            transition: var(--transition);
+        }
+
+        .btn-primary { background: var(--primary); color: white; border: none; }
+        .btn-primary:hover { background: var(--primary-dark); transform: scale(1.02); }
+        .btn-review { border-color: var(--review); color: var(--review); }
+        .btn-review:hover { background: #fffbeb; }
+
+        /* Palette */
+        .palette-section {
+            width: 360px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            padding: 32px;
+        }
+
+        .palette-title { font-size: 18px; font-weight: 700; margin-bottom: 24px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .palette-item {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .palette-item:hover { border-color: var(--primary); color: var(--primary); }
+        .palette-item.active { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary); }
+        .palette-item.answered { background: var(--success); color: white; border-color: var(--success); }
+        .palette-item.review { background: var(--review); color: white; border-color: var(--review); }
+
+        .legend {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; color: var(--text-muted); }
+        .box { width: 16px; height: 16px; border-radius: 4px; }
+        .box.ans { background: var(--success); }
+        .box.rev { background: var(--review); }
+        .box.no { background: var(--border); }
+
+        .submit-btn {
+            background: #1e293b;
+            color: white;
+            padding: 18px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+        }
+
+        .submit-btn:hover { background: #000; transform: translateY(-2px); }
+
+        /* Results */
+        .results-card {
+            background: white;
+            border-radius: 32px;
+            padding: 60px;
+            box-shadow: var(--shadow);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .results-summary {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 60px;
+        }
+
+        .score-box { text-align: center; }
+        .score-num { font-size: 80px; font-weight: 800; color: var(--primary); display: block; line-height: 1; }
+        .score-label { font-size: 18px; color: var(--text-muted); font-weight: 600; }
+
+        .stat-group { display: flex; flex-direction: column; gap: 16px; }
+        .stat-pill { padding: 12px 24px; border-radius: 12px; background: #f8fafc; display: flex; justify-content: space-between; gap: 40px; font-weight: 700; }
+
+        .review-area {
+            border-top: 2px solid var(--border);
+            padding-top: 40px;
+        }
+
+        .review-item {
+            padding: 24px;
+            border-radius: 16px;
+            background: #f8fafc;
+            margin-bottom: 24px;
+        }
+
+        .review-item h4 { margin-bottom: 12px; font-size: 18px; }
+        .explanation { background: var(--secondary); padding: 16px; border-radius: 8px; margin-top: 16px; font-size: 14px; border-left: 4px solid var(--primary); }
+
+        /* Helpers */
+        .text-success { color: var(--success); }
+        .text-error { color: var(--error); }
+    </style>
+</head>
+<body>
+
+    <header class="top-bar">
+        <div class="logo">
+            <div class="logo-icon">🎓</div>
+            <h1>NET Prep Master</h1>
+        </div>
+        <div id="exam-timer" class="exam-timer">03:00:00</div>
+        <div class="user-info" style="font-weight: 700; color: var(--text-muted);">UGC NET 2026 Simulator</div>
+    </header>
+
+    <main>
+        <!-- Dashboard -->
+        <section id="dashboard" class="view active">
+            <div class="dashboard-header">
+                <h2>Master Your UGC NET Success</h2>
+                <p>Real-time CBT simulation with 10 years of authentic previous year questions.</p>
+            </div>
+
+            <div class="cards-grid">
+                <!-- Full Mock Test -->
+                <div class="card" onclick="app.startTest('mock')">
+                    <span class="card-icon">⚡</span>
+                    <h3>Full Mock Test</h3>
+                    <p>Experience the complete 150-question marathon in a real exam environment. Timer starts immediately.</p>
+                    <button class="btn btn-primary" style="width: 100%;">Begin Simulator</button>
+                </div>
+
+                <!-- PYQ Practice -->
+                <div class="card" style="cursor: default;">
+                    <span class="card-icon">📅</span>
+                    <h3>Previous Year Papers</h3>
+                    <p>Select a specific year to practice focused sets. Covers 10 years from 2015 to 2025.</p>
+                    <div class="year-select-container">
+                        <select id="year-select" onchange="app.startTest('pyq', this.value)">
+                            <option value="">Select Year (10 Years)</option>
+                            <option value="2025">2025 (Predicted)</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                            <option value="2021">2021</option>
+                            <option value="2020">2020</option>
+                            <option value="2019">2019</option>
+                            <option value="2018">2018</option>
+                            <option value="2017">2017</option>
+                            <option value="2016">2016</option>
+                            <option value="2015">2015</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Analysis -->
+                <div class="card">
+                    <span class="card-icon">📊</span>
+                    <h3>Topic-wise Practice</h3>
+                    <p>Focus on your weak areas like Research Aptitude, ICT, or Higher Education.</p>
+                    <button class="btn" style="width: 100%;">Explore Topics</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Exam Simulator -->
+        <section id="exam-view" class="view">
+            <div class="cbt-container">
+                <div class="question-section">
+                    <div class="q-header">
+                        <h2 id="q-label">Question 1</h2>
+                        <div id="q-meta" class="q-tag">Paper 1 | ICT</div>
+                    </div>
+                    <div class="q-scroll-area">
+                        <div id="q-text" class="q-text">Loading question...</div>
+                        <div id="options" class="options-list">
+                            <!-- Options -->
+                        </div>
+                    </div>
+                    <div class="cbt-footer">
+                        <button class="btn btn-review" onclick="app.markReview()">Mark for Review & Next</button>
+                        <div style="display: flex; gap: 16px;">
+                            <button class="btn" onclick="app.prev()">Previous</button>
+                            <button class="btn btn-primary" onclick="app.next()">Save & Next</button>
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="palette-section">
+                    <div class="palette-title">Exam Navigation</div>
+                    <div id="palette-grid" class="palette-grid">
+                        <!-- Palette -->
+                    </div>
+
+                    <div class="legend">
+                        <div class="legend-item"><div class="box ans"></div> Answered</div>
+                        <div class="legend-item"><div class="box no"></div> Not Answered</div>
+                        <div class="legend-item"><div class="box rev"></div> Marked for Review</div>
+                    </div>
+
+                    <button class="submit-btn" onclick="app.submit()">Submit Test</button>
+                </aside>
+            </div>
+        </section>
+
+        <!-- Result Screen -->
+        <section id="result-view" class="view">
+            <div class="results-card">
+                <div style="text-align: center; margin-bottom: 40px;">
+                    <h2 style="font-size: 32px; font-weight: 800;">Exam Performance Report</h2>
+                </div>
+
+                <div class="results-summary">
+                    <div class="score-box">
+                        <span id="res-score" class="score-num">0</span>
+                        <span class="score-label">Total Score</span>
+                    </div>
+                    <div class="stat-group">
+                        <div class="stat-pill">Correct <span id="res-correct" class="text-success">0</span></div>
+                        <div class="stat-pill">Incorrect <span id="res-wrong" class="text-error">0</span></div>
+                        <div class="stat-pill">Accuracy <span id="res-acc">0%</span></div>
+                    </div>
+                </div>
+
+                <div class="review-area" id="review-area">
+                    <h3 style="margin-bottom: 24px;">Question Review</h3>
+                    <!-- Review items -->
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <button class="btn btn-primary" style="width: 100%; padding: 20px;" onclick="location.reload()">Back to Home</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const questionBank = [
+            { id: 1, year: '2025', paper: 'Paper 1', topic: 'ICT', text: 'Which technology is the foundation of the 6th generation of computers?', opts: ['Artificial Intelligence', 'Nanotechnology', 'Bio-chips', 'Quantum Computing'], ans: 'Bio-chips', exp: 'The 6th generation of computers is expected to use bio-chips and advanced AI.' },
+            { id: 2, year: '2024', paper: 'Paper 1', topic: 'Environment', text: 'India aims to achieve Net Zero carbon emissions by which year?', opts: ['2030', '2045', '2070', '2050'], ans: '2070', exp: 'India announced its target to achieve Net Zero by 2070 at COP26.' },
+            { id: 3, year: '2023', paper: 'Paper 1', topic: 'Higher Education', text: 'NEP 2020 suggests which model for professional education?', opts: ['Stand-alone universities', 'Multidisciplinary HEIs', 'Technical colleges', 'Vocational centers'], ans: 'Multidisciplinary HEIs', exp: 'NEP 2020 emphasizes multidisciplinary education across all sectors.' },
+            { id: 4, year: '2022', paper: 'Paper 2', topic: 'Education', text: 'Cognitive development theory was pioneered by:', opts: ['Skinner', 'Pavlov', 'Piaget', 'Rogers'], ans: 'Piaget', exp: 'Jean Piaget is known for his four stages of cognitive development.' },
+            { id: 5, year: '2021', paper: 'Paper 1', topic: 'Research', text: 'A "null hypothesis" is:', opts: ['A positive statement', 'No difference statement', 'Subjective statement', 'Mathematical proof'], ans: 'No difference statement', exp: 'A null hypothesis states that there is no statistical significance between variables.' },
+            { id: 6, year: '2020', paper: 'Paper 1', topic: 'Teaching', text: 'The most effective method of teaching is:', opts: ['Lecture', 'Discussion', 'Demonstration', 'Interactive'], ans: 'Interactive', exp: 'Interactive teaching promotes student engagement and better retention.' },
+            { id: 7, year: '2019', paper: 'Paper 1', topic: 'Communication', text: 'Noise in communication is also known as:', opts: ['Entropy', 'Redundancy', 'Channel', 'Feedback'], ans: 'Entropy', exp: 'Entropy refers to the disorder or noise that disrupts the communication signal.' },
+            { id: 8, year: '2018', paper: 'Paper 1', topic: 'ICT', text: 'HTTP stands for:', opts: ['High Text Transfer Protocol', 'Hyper Text Transfer Protocol', 'Hyper Tool Transfer Protocol', 'High Tool Transfer Protocol'], ans: 'Hyper Text Transfer Protocol', exp: 'HTTP is the foundation of data communication for the World Wide Web.' },
+            { id: 9, year: '2017', paper: 'Paper 1', topic: 'Reasoning', text: 'If A=1, B=2, then CAT is:', opts: ['24', '20', '22', '26'], ans: '24', exp: 'C=3, A=1, T=20. 3+1+20 = 24.' },
+            { id: 10, year: '2016', paper: 'Paper 1', topic: 'Environment', text: 'The main cause of Global Warming is:', opts: ['Nitrogen', 'Oxygen', 'Carbon Dioxide', 'Argon'], ans: 'Carbon Dioxide', exp: 'CO2 is the primary greenhouse gas contributing to global warming.' },
+            { id: 11, year: '2015', paper: 'Paper 1', topic: 'Higher Education', text: 'The first university in India was established in:', opts: ['Mumbai', 'Kolkata', 'Chennai', 'Delhi'], ans: 'Kolkata', exp: 'The University of Calcutta was established in 1857.' }
+        ];
+
+        class UGCApp {
+            constructor() {
+                this.currentSet = [];
+                this.idx = 0;
+                this.answers = {};
+                this.status = {};
+                this.timer = null;
+                this.time = 180 * 60;
+            }
+
+            show(id) {
+                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                document.getElementById(id).classList.add('active');
+                document.getElementById('exam-timer').style.display = id === 'exam-view' ? 'block' : 'none';
+            }
+
+            startTest(type, val) {
+                this.currentSet = type === 'mock' ? [...questionBank] : questionBank.filter(q => q.year === val);
+                if (this.currentSet.length === 0) return alert('No data available for this selection.');
+                
+                this.idx = 0;
+                this.answers = {};
+                this.status = this.currentSet.reduce((a, _, i) => ({...a, [i]: 'un'}), {});
+                this.show('exam-view');
+                this.render();
+                this.startTimer();
+            }
+
+            render() {
+                const q = this.currentSet[this.idx];
+                document.getElementById('q-label').innerText = `Question ${this.idx + 1}`;
+                document.getElementById('q-meta').innerText = `${q.paper} | ${q.topic} (${q.year})`;
+                document.getElementById('q-text').innerText = q.text;
+
+                const optBox = document.getElementById('options');
+                optBox.innerHTML = '';
+                q.opts.forEach(o => {
+                    const div = document.createElement('div');
+                    div.className = `option ${this.answers[this.idx] === o ? 'selected' : ''}`;
+                    div.innerHTML = `<div class="option-bullet"></div> ${o}`;
+                    div.onclick = () => {
+                        this.answers[this.idx] = o;
+                        this.status[this.idx] = 'ans';
+                        this.render();
+                    };
+                    optBox.appendChild(div);
+                });
+
+                const pal = document.getElementById('palette-grid');
+                pal.innerHTML = '';
+                this.currentSet.forEach((_, i) => {
+                    const d = document.createElement('div');
+                    d.className = `palette-item ${this.status[i]} ${this.idx === i ? 'active' : ''}`;
+                    d.innerText = i + 1;
+                    d.onclick = () => { this.idx = i; this.render(); };
+                    pal.appendChild(d);
+                });
+            }
+
+            next() { if (this.idx < this.currentSet.length - 1) { this.idx++; this.render(); } }
+            prev() { if (this.idx > 0) { this.idx--; this.render(); } }
+            markReview() { this.status[this.idx] = 'rev'; this.next(); }
+
+            startTimer() {
+                this.time = 180 * 60;
+                if (this.timer) clearInterval(this.timer);
+                this.timer = setInterval(() => {
+                    this.time--;
+                    const h = Math.floor(this.time / 3600);
+                    const m = Math.floor((this.time % 3600) / 60);
+                    const s = this.time % 60;
+                    document.getElementById('exam-timer').innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                    if (this.time <= 0) this.submit();
+                }, 1000);
+            }
+
+            submit() {
+                clearInterval(this.timer);
+                let correct = 0;
+                this.currentSet.forEach((q, i) => { if (this.answers[i] === q.ans) correct++; });
+                
+                this.show('result-view');
+                document.getElementById('res-score').innerText = correct * 2;
+                document.getElementById('res-correct').innerText = correct;
+                document.getElementById('res-wrong').innerText = this.currentSet.length - correct;
+                document.getElementById('res-acc').innerText = ((correct / this.currentSet.length) * 100).toFixed(1) + '%';
+
+                const area = document.getElementById('review-area');
+                area.innerHTML = '';
+                this.currentSet.forEach((q, i) => {
+                    const div = document.createElement('div');
+                    div.className = 'review-item';
+                    const isCor = this.answers[i] === q.ans;
+                    div.innerHTML = `
+                        <h4>Q${i+1}: ${q.text}</h4>
+                        <p class="${isCor ? 'text-success' : 'text-error'}">Your Answer: ${this.answers[i] || 'Skipped'}</p>
+                        ${!isCor ? `<p class="text-success">Correct Answer: ${q.ans}</p>` : ''}
+                        <div class="explanation"><strong>Explanation:</strong> ${q.exp}</div>
+                    `;
+                    area.appendChild(div);
+                });
+            }
+        }
+
+        const app = new UGCApp();
+    </script>
+</body>
+</html>
