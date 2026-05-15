@@ -40,7 +40,7 @@
         .timer { background: #fef2f2; color: var(--error); padding: 8px 16px; border-radius: 10px; font-weight: 800; border: 2px solid #fee2e2; display: none; }
 
         /* Content */
-        main { flex: 1; overflow-y: auto; position: relative; }
+        main { flex: 1; overflow-y: auto; position: relative; scroll-behavior: smooth; }
         .view { display: none; padding: 40px; max-width: 1400px; margin: 0 auto; width: 100%; }
         .view.active { display: block; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -112,6 +112,16 @@
 
         .text-success { color: var(--success); }
         .text-error { color: var(--error); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 2000;
+        }
+        .modal {
+            background: white; padding: 40px; border-radius: 24px; max-width: 500px; width: 90%; text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
@@ -129,7 +139,7 @@
         </div>
     </header>
 
-    <main>
+    <main id="main-scroll">
         <!-- Dashboard -->
         <section id="dashboard" class="view active">
             <div class="dash-header">
@@ -210,7 +220,7 @@
                         <div class="leg-item"><div class="box rev"></div> Marked for Review</div>
                     </div>
 
-                    <button class="submit-btn" onclick="app.submit()">Finish & Submit</button>
+                    <button class="submit-btn" onclick="app.showSubmitModal()">Finish & Submit</button>
                 </aside>
             </div>
         </section>
@@ -239,14 +249,24 @@
         </section>
     </main>
 
+    <!-- Submit Confirmation Modal -->
+    <div id="submit-modal" class="modal-overlay">
+        <div class="modal">
+            <h2 id="modal-title">Submit Exam?</h2>
+            <p id="modal-desc" style="margin: 20px 0; color: var(--text-muted);">You have answered 0 out of 150 questions.</p>
+            <div style="display: flex; gap: 16px;">
+                <button class="btn" style="flex: 1;" onclick="app.hideSubmitModal()">Review More</button>
+                <button class="btn btn-primary" style="flex: 1;" onclick="app.submit()">Yes, Submit</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Expanded Bilingual Dataset
         const bank = [];
         const years = ['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'];
         const topics = ['Teaching Aptitude', 'Research Aptitude', 'Communication', 'ICT', 'Higher Education', 'Environment'];
 
-        // Generating a structured 150 question bank for demo (50 P1 + 100 P2)
-        // In real app, this would be imported from a large JSON
         function seedData() {
             // Paper 1 (50 Qs)
             for(let i=1; i<=50; i++) {
@@ -298,7 +318,7 @@
 
         class CBTApp {
             constructor() {
-                this.lang = 'en'; // 'en' or 'hi'
+                this.lang = 'en'; 
                 this.testData = [];
                 this.idx = 0;
                 this.userAns = {};
@@ -317,17 +337,17 @@
                 document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
                 document.getElementById(id).classList.add('active');
                 document.getElementById('exam-timer').style.display = id === 'exam-view' ? 'block' : 'none';
+                
+                // Scroll main container to top
+                document.getElementById('main-scroll').scrollTop = 0;
             }
 
             startTest(type, val) {
                 if (type === 'mock') {
-                    // Full 150 Qs
                     this.testData = [...bank];
                 } else {
-                    // Filtered by year
                     this.testData = bank.filter(q => q.year === val);
                     if (this.testData.length < 5) {
-                        // If too few in bank, pad with some others for demo
                         this.testData = bank.slice(0, 10).map(q => ({...q, year: val}));
                     }
                 }
@@ -362,6 +382,10 @@
                     box.appendChild(div);
                 });
 
+                this.renderPalette();
+            }
+
+            renderPalette() {
                 const pal = document.getElementById('pal-grid');
                 pal.innerHTML = '';
                 this.testData.forEach((_, i) => {
@@ -386,13 +410,36 @@
                     const m = Math.floor((this.seconds % 3600) / 60);
                     const s = this.seconds % 60;
                     document.getElementById('exam-timer').innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-                    if (this.seconds <= 0) this.submit();
+                    if (this.seconds <= 0) this.autoSubmit();
                 }, 1000);
             }
 
-            submit() {
-                if (!confirm(this.lang === 'en' ? 'Submit your test?' : 'क्या आप अपना टेस्ट सबमिट करना चाहते हैं?')) return;
+            showSubmitModal() {
+                const answered = Object.keys(this.userAns).length;
+                const total = this.testData.length;
+                document.getElementById('modal-title').innerText = this.lang === 'en' ? 'Submit Exam?' : 'परीक्षा सबमिट करें?';
+                document.getElementById('modal-desc').innerText = this.lang === 'en' 
+                    ? `You have answered ${answered} out of ${total} questions.` 
+                    : `आपने ${total} में से ${answered} प्रश्नों के उत्तर दिए हैं।`;
+                document.getElementById('submit-modal').style.display = 'flex';
+            }
+
+            hideSubmitModal() {
+                document.getElementById('submit-modal').style.display = 'none';
+            }
+
+            autoSubmit() {
                 clearInterval(this.timer);
+                this.performSubmit();
+            }
+
+            submit() {
+                this.hideSubmitModal();
+                clearInterval(this.timer);
+                this.performSubmit();
+            }
+
+            performSubmit() {
                 let correct = 0;
                 this.testData.forEach((q, i) => { if (this.userAns[i] === q[this.lang].ans) correct++; });
                 
@@ -402,8 +449,12 @@
                 document.getElementById('res-err').innerText = this.testData.length - correct;
                 document.getElementById('res-acc').innerText = ((correct / this.testData.length) * 100).toFixed(1) + '%';
 
+                // Render review list efficiently
                 const list = document.getElementById('rev-list');
                 list.innerHTML = `<h3 style="margin-bottom:20px;">${this.lang === 'en' ? 'Answer Key & Analysis' : 'उत्तर कुंजी और विश्लेषण'}</h3>`;
+                
+                // Use a document fragment for better performance with 150 items
+                const fragment = document.createDocumentFragment();
                 this.testData.forEach((q, i) => {
                     const content = q[this.lang];
                     const div = document.createElement('div');
@@ -415,8 +466,12 @@
                         ${!isCor ? `<p class="text-success">${this.lang === 'en' ? 'Correct' : 'सही'}: ${content.ans}</p>` : ''}
                         <div class="exp"><strong>${this.lang === 'en' ? 'Explanation' : 'स्पष्टीकरण'}:</strong> ${content.exp}</div>
                     `;
-                    list.appendChild(div);
+                    fragment.appendChild(div);
                 });
+                list.appendChild(fragment);
+                
+                // Final scroll to top of main content
+                document.getElementById('main-scroll').scrollTop = 0;
             }
         }
 
