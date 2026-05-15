@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NET Prep Master - CBT Exam Simulation</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation / Top Bar -->
+        <header class="top-bar">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <h1>NET Prep Master</h1>
+            </div>
+            <div id="exam-timer" class="timer-display" style="display: none;">
+                Time Left: <span id="timer-val">03:00:00</span>
+            </div>
+            <div class="user-profile">
+                <span id="user-name">Guest Aspirant</span>
+                <div class="avatar">👤</div>
+            </div>
+        </header>
+
+        <main id="main-content">
+            <!-- Dashboard View -->
+            <section id="dashboard" class="view active">
+                <div class="hero-section">
+                    <h2>UGC NET Exam Preparation 2026</h2>
+                    <p>Simulate real exam environments and practice 10 years of PYQs.</p>
+                </div>
+
+                <div class="action-grid">
+                    <div class="action-card primary" onclick="app.startMockTest()">
+                        <div class="card-body">
+                            <span class="icon">📝</span>
+                            <h3>Full Mock Test</h3>
+                            <p>150 Questions | 3 Hours | Real CBT Interface</p>
+                            <button class="btn-action">Start Now</button>
+                        </div>
+                    </div>
+
+                    <div class="action-card secondary">
+                        <div class="card-body">
+                            <span class="icon">📚</span>
+                            <h3>Previous Year Papers</h3>
+                            <div class="year-selector">
+                                <select id="pyq-year-select" onchange="app.loadPYQ(this.value)">
+                                    <option value="">Select Year (2015-2025)</option>
+                                    <option value="2025">2025 (Predicted)</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2022">2022</option>
+                                    <option value="2021">2021</option>
+                                    <option value="2020">2020</option>
+                                    <option value="2019">2019</option>
+                                    <option value="2018">2018</option>
+                                    <option value="2017">2017</option>
+                                    <option value="2016">2016</option>
+                                    <option value="2015">2015</option>
+                                </select>
+                            </div>
+                            <p>Practice specific year papers with analysis.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <h3>Your Performance Overview</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-val">0</span>
+                            <span class="stat-label">Tests Attempted</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-val">0%</span>
+                            <span class="stat-label">Average Accuracy</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-val">0</span>
+                            <span class="stat-label">PYQs Solved</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Exam Mode View -->
+            <section id="exam-mode" class="view">
+                <div class="cbt-container">
+                    <div class="exam-left">
+                        <div class="question-header">
+                            <span id="q-number">Question 1</span>
+                            <div class="q-meta">
+                                <span id="q-paper">Paper 1</span> | <span id="q-topic">Teaching Aptitude</span>
+                            </div>
+                        </div>
+                        <div class="question-body">
+                            <p id="q-text">Loading question...</p>
+                            <div id="options-container" class="options-list">
+                                <!-- Options will be injected here -->
+                            </div>
+                        </div>
+                        <div class="question-footer">
+                            <div class="left-btns">
+                                <button class="btn btn-review" onclick="app.markForReview()">Mark for Review & Next</button>
+                                <button class="btn btn-clear" onclick="app.clearResponse()">Clear Response</button>
+                            </div>
+                            <div class="right-btns">
+                                <button class="btn btn-prev" onclick="app.prevQuestion()">Previous</button>
+                                <button class="btn btn-next" onclick="app.nextQuestion()">Save & Next</button>
+                            </div>
+                        </div>
+                    </div>
+                    <aside class="exam-right">
+                        <div class="palette-header">Question Palette</div>
+                        <div id="q-palette" class="palette-grid">
+                            <!-- Palette items injected here -->
+                        </div>
+                        <div class="palette-legend">
+                            <div class="legend-item"><span class="box answered"></span> Answered</div>
+                            <div class="legend-item"><span class="box unanswered"></span> Not Answered</div>
+                            <div class="legend-item"><span class="box review"></span> Marked for Review</div>
+                            <div class="legend-item"><span class="box current"></span> Current</div>
+                        </div>
+                        <button class="btn-submit" onclick="app.submitExam()">Submit Test</button>
+                    </aside>
+                </div>
+            </section>
+
+            <!-- Result View -->
+            <section id="result-view" class="view">
+                <div class="result-container">
+                    <div class="result-header">
+                        <h2>Exam Result Summary</h2>
+                        <button class="btn-close" onclick="app.showDashboard()">✖</button>
+                    </div>
+                    <div class="score-summary">
+                        <div class="score-main">
+                            <span id="res-score">0</span>
+                            <p>Total Score</p>
+                        </div>
+                        <div class="res-details">
+                            <div class="res-item">Correct: <span id="res-correct" class="text-success">0</span></div>
+                            <div class="res-item">Wrong: <span id="res-wrong" class="text-error">0</span></div>
+                            <div class="res-item">Accuracy: <span id="res-accuracy">0%</span></div>
+                        </div>
+                    </div>
+                    <div class="review-list" id="review-list">
+                        <!-- Review items injected here -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script type="module" src="./main.js"></script>
+</body>
+</html>
