@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NET Prep Master Preview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2196F3;
+            --primary-light: #E3F2FD;
+            --background: #FFFFFF;
+            --text: #212121;
+            --text-light: #757575;
+            --success: #4CAF50;
+            --error: #F44336;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* Phone Frame Simulation */
+        .phone-container {
+            max-width: 400px;
+            height: 800px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 40px;
+            border: 8px solid #333;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .status-bar {
+            height: 40px;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            height: calc(100% - 40px);
+            width: 100%;
+            position: absolute;
+            top: 40px;
+            left: 0;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Splash Screen */
+        #splash {
+            background: var(--primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 100;
+        }
+
+        .logo-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        .app-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Dashboard */
+        .header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .welcome {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-shadow);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            font-size: 20px;
+        }
+
+        .card-title {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .card-desc {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        /* Mock Test Screen */
+        .test-header {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .timer {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .question-content {
+            padding: 20px;
+            height: calc(100% - 140px);
+            overflow-y: auto;
+        }
+
+        .q-num {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .q-text {
+            font-size: 17px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .option {
+            padding: 16px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+        }
+
+        .option.selected {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            margin-right: 12px;
+        }
+
+        .selected .radio {
+            border-color: var(--primary);
+            background: var(--primary);
+            box-shadow: inset 0 0 0 4px white;
+        }
+
+        .test-footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 16px 20px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid #ddd;
+        }
+
+        /* Result Screen */
+        .result-container {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 8px solid var(--primary);
+            margin: 30px auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .score-val {
+            font-size: 40px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            padding: 16px;
+            background: #fcfcfc;
+            border-radius: 16px;
+            border: 1px solid #eee;
+        }
+
+        .stat-val {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        <div class="status-bar">
+            <span>12:00</span>
+            <span>📶 🔋</span>
+        </div>
+
+        <!-- Splash Screen -->
+        <div id="splash" class="screen active">
+            <div class="logo-icon">🎓</div>
+            <div class="app-name">NET Prep Master</div>
+            <div style="margin-top: 20px; font-size: 14px; opacity: 0.8;">Loading Success...</div>
+        </div>
+
+        <!-- Home Screen -->
+        <div id="home" class="screen">
+            <div class="header">
+                <div>
+                    <div class="welcome">Hello, Aspirant!</div>
+                    <div class="subtitle">Ready to crack UGC NET today?</div>
+                </div>
+                <div style="font-size: 24px;">👤</div>
+            </div>
+
+            <div class="grid">
+                <div class="card" onclick="showScreen('test')">
+                    <div class="card-icon" style="background: rgba(33, 150, 243, 0.1); color: #2196F3;">📝</div>
+                    <div class="card-title">Mock Test</div>
+                    <div class="card-desc">Simulate real exam</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" style="background: rgba(255, 152, 0, 0.1); color: #FF9800;">📚</div>
+                    <div class="card-title">Practice PYQ</div>
+                    <div class="card-desc">10 Years Papers</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" style="background: rgba(76, 175, 80, 0.1); color: #4CAF50;">📖</div>
+                    <div class="card-title">Chapter Wise</div>
+                    <div class="card-desc">Topic practice</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon" style="background: rgba(244, 67, 54, 0.1); color: #F44336;">❌</div>
+                    <div class="card-title">Review</div>
+                    <div class="card-desc">Wrong Answers</div>
+                </div>
+            </div>
+
+            <div style="padding: 0 20px;">
+                <div style="background: var(--primary-light); padding: 20px; border-radius: 20px; display: flex; align-items: center;">
+                    <div style="font-size: 30px; margin-right: 15px;">🔥</div>
+                    <div>
+                        <div style="font-weight: 700;">Daily Practice Streak</div>
+                        <div style="font-size: 13px; color: var(--text-light);">You have practiced for 5 days!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mock Test Screen -->
+        <div id="test" class="screen">
+            <div class="test-header">
+                <div style="font-weight: 700;">Mock Test 01</div>
+                <div class="timer">02:59:45</div>
+            </div>
+
+            <div class="question-content">
+                <div class="q-num">Question 1</div>
+                <div class="q-text">Which of the following is the main objective of teaching?</div>
+                
+                <div class="option" onclick="selectOption(this)">
+                    <div class="radio"></div>
+                    <div>To give information related to syllabus</div>
+                </div>
+                <div class="option selected" onclick="selectOption(this)">
+                    <div class="radio"></div>
+                    <div>To develop thinking power of students</div>
+                </div>
+                <div class="option" onclick="selectOption(this)">
+                    <div class="radio"></div>
+                    <div>To dictate notes to students</div>
+                </div>
+                <div class="option" onclick="selectOption(this)">
+                    <div class="radio"></div>
+                    <div>To prepare students for exam</div>
+                </div>
+            </div>
+
+            <div class="test-footer">
+                <button class="btn btn-outline" onclick="showScreen('home')">Quit</button>
+                <button class="btn btn-primary" onclick="showScreen('result')">Submit</button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result" class="screen">
+            <div class="test-header">
+                <div style="font-weight: 700;">Test Summary</div>
+                <div style="cursor: pointer;" onclick="showScreen('home')">✖</div>
+            </div>
+
+            <div class="result-container">
+                <div class="score-circle">
+                    <div style="font-size: 14px; color: var(--text-light);">Your Score</div>
+                    <div class="score-val">180</div>
+                    <div style="font-size: 12px;">out of 300</div>
+                </div>
+
+                <h3>Excellent Effort!</h3>
+                <p style="color: var(--text-light); font-size: 14px; margin-top: 8px;">Keep practicing to reach your goal.</p>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-val" style="color: var(--success);">90%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-val">45/50</div>
+                        <div class="stat-label">Questions</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" style="width: 100%; margin-top: 30px;" onclick="showScreen('home')">Go to Dashboard</button>
+                <button class="btn btn-outline" style="width: 100%; margin-top: 12px;">Review Answers</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function selectOption(el) {
+            document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        // Initial sequence
+        setTimeout(() => {
+            showScreen('home');
+        }, 2000);
+    </script>
+</body>
+</html>

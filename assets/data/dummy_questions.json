@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1",
+    "question": "Which of the following is the main objective of teaching?",
+    "options": [
+      "To give information related to the syllabus.",
+      "To develop thinking power of students.",
+      "To dictate notes to students.",
+      "To prepare students to pass the examination."
+    ],
+    "correctAnswer": "To develop thinking power of students.",
+    "explanation": "The primary goal of teaching is to facilitate learning and develop the cognitive abilities of students, including critical thinking.",
+    "subject": "Teaching Aptitude",
+    "paperType": "Paper1",
+    "topic": "Objectives of Teaching",
+    "year": "2023"
+  },
+  {
+    "id": "2",
+    "question": "Who proposed constructivism theory?",
+    "options": [
+      "Piaget",
+      "Skinner",
+      "Thorndike",
+      "Pavlov"
+    ],
+    "correctAnswer": "Piaget",
+    "explanation": "Jean Piaget proposed constructivism learning theory, which suggests that humans construct knowledge through their experiences.",
+    "subject": "Education",
+    "paperType": "Paper2",
+    "topic": "Educational Psychology",
+    "year": "2022"
+  },
+  {
+    "id": "3",
+    "question": "Which of the following is a non-probability sampling method?",
+    "options": [
+      "Simple Random Sampling",
+      "Stratified Sampling",
+      "Quota Sampling",
+      "Cluster Sampling"
+    ],
+    "correctAnswer": "Quota Sampling",
+    "explanation": "Quota sampling is a non-probability sampling technique where researchers create a sample involving individuals that represent a population.",
+    "subject": "Research Aptitude",
+    "paperType": "Paper1",
+    "topic": "Sampling Methods",
+    "year": "2021"
+  }
+]
